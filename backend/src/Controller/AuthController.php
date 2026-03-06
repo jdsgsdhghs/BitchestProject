@@ -29,13 +29,10 @@ final class AuthController extends AbstractController
 
         $mail = trim((string) ($data['mail'] ?? ''));
         $password = (string) ($data['password'] ?? '');
-        $nom = trim((string) ($data['nom'] ?? ''));
-        $prenom = trim((string) ($data['prenom'] ?? ''));
-        $fonction = isset($data['fonction']) ? trim((string) $data['fonction']) : null;
 
-        if ($mail === '' || $password === '' || $nom === '' || $prenom === '') {
+        if ($mail === '' || $password === '') {
             return $this->json([
-                'error' => 'mail, password, nom et prenom requis'
+                'error' => 'mail/password requis'
             ], 400);
         }
 
@@ -45,9 +42,6 @@ final class AuthController extends AbstractController
 
         $user = new User();
         $user->setMail($mail);
-        $user->setNom($nom);
-        $user->setPrenom($prenom);
-        $user->setFonction($fonction !== '' ? $fonction : null);
         $user->setCreationDate(new \DateTimeImmutable());
         $user->setRole(Roles::ROLE_USER);
         $user->setPassword($hasher->hashPassword($user, $password));

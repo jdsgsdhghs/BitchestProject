@@ -24,10 +24,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     private string $password = '';
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $nom = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $prenom = null;
 
     #[ORM\Column(length: 255, nullable: true)]
@@ -69,7 +69,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->nom;
     }
 
-    public function setNom(string $nom): static
+    public function setNom(?string $nom): static
     {
         $this->nom = $nom;
         return $this;
@@ -80,7 +80,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->prenom;
     }
 
-    public function setPrenom(string $prenom): static
+    public function setPrenom(?string $prenom): static
     {
         $this->prenom = $prenom;
         return $this;
@@ -140,9 +140,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->creationDate;
     }
 
-    /**
-     * Accepte DateTime OU DateTimeImmutable, et stocke toujours en DateTimeImmutable.
-     */
     public function setCreationDate(\DateTimeInterface $creationDate): static
     {
         $this->creationDate = $creationDate instanceof \DateTimeImmutable
@@ -154,7 +151,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function eraseCredentials(): void
     {
-        // Si tu stockes un plainPassword temporaire, tu le clears ici
     }
 
     public function getWallet(): ?Wallet
@@ -173,6 +169,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         }
 
         $this->wallet = $wallet;
+
         return $this;
     }
 }

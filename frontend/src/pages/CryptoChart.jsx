@@ -79,8 +79,8 @@ export default function CryptoChart() {
     const loadQuotations = async () => {
       try {
         const r = await fetch(
-          `/api/crypto/${selected.id}/quotations`,
-        );
+          `http://localhost:8000/api/crypto/${selected.id}/quotations`,
+        {credentials: "include"});
         if (!r.ok) throw new Error(`Erreur HTTP ${r.status}`);
         const json = await r.json();
 

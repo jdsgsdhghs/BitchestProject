@@ -87,19 +87,19 @@ export default function Login() {
     setLoading(true);
     try {
       if (register) {
-        await apiFetch("/api/register", {
+        await apiFetch("http://localhost:8000/api/register", {
           mail: cleanMail,
           password,
         });
 
-        await apiFetch("/api/login", {
+        await apiFetch("http://localhost:8000/api/login", {
           mail: cleanMail,
           password,
         });
 
         setInfo("Compte créé et connecté");
       } else {
-        await apiFetch("/api/login", {
+        await apiFetch("http://localhost:8000/api/login", {
           mail: cleanMail,
           password,
         });

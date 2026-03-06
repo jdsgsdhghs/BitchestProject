@@ -16,7 +16,7 @@ import CryptoChart from "./pages/CryptoChart";
 
 export default function App() {
   useEffect(() => {
-    fetch("/api/health")
+    fetch("http://localhost:8000/api/health")
       .then((r) => r.json())
       .then((data) => console.log("health:", data))
       .catch((err) => console.error("health error:", err));
