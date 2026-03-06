@@ -8,7 +8,7 @@ export default function RequireAuth() {
   useEffect(() => {
     let cancelled = false;
 
-    fetch("http://localhost:8000/api/me", {
+    fetch("/api/me", {
       method: "GET",
       credentials: "include",
     })

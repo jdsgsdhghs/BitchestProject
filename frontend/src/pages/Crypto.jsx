@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import BuyCrypto from "../Components/Buy";
+import Header from "../Components/layout/Header";
+import Footer from "../Components/layout/Footer";
 
 export default function CryptoDashbord({ userId }) {
   const [cryptos, setCrypto] = useState([]);
@@ -7,21 +9,24 @@ export default function CryptoDashbord({ userId }) {
   const [user, setUser] = useState({});
 
   useEffect(() => {
-    fetch("http://localhost:8000/api/crypto", {
+    fetch("/api/crypto", {
       headers: { "Content-Type": "application/json" },
-      credentials: "include",})
+      credentials: "include",
+    })
       .then((r) => r.json())
       .then((data) => setCrypto(data.CryptoCurrencies || []))
       .catch((err) => console.error("health error:", err));
-    fetch("http://localhost:8000/api/acquieredcrypto", {
+    fetch("/api/acquieredcrypto", {
       headers: { "Content-Type": "application/json" },
-      credentials: "include",})
+      credentials: "include",
+    })
       .then((r) => r.json())
       .then((data) => setAcquieredCrypto(data.acquieredCrypto || []))
       .catch((err) => console.error("health error:", err));
-    fetch(`http://localhost:8000/api/admin/${userId}`, {
+    fetch(`/api/admin/${userId}`, {
       headers: { "Content-Type": "application/json" },
-      credentials: "include",})
+      credentials: "include",
+    })
       .then((r) => r.json())
       .then((data) => setUser(data || []))
       .catch((err) => console.error("user error:", err));
@@ -47,6 +52,7 @@ export default function CryptoDashbord({ userId }) {
 
   return (
     <>
+      <Header />
       {cryptos
         ? cryptos.map((crypto) => {
             return (
@@ -71,6 +77,7 @@ export default function CryptoDashbord({ userId }) {
           </ul>
         </div>
       ))}
+      <Footer />
     </>
   );
 }

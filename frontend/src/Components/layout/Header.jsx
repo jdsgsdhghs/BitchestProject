@@ -7,7 +7,6 @@ const navItems = [
   { to: "/profile", label: "Profil" },
   { to: "/crypto", label: "Crypto" },
   { to: "/cryptos", label: "Marchés" },
-  { to: "/edit", label: "Édition" },
 ];
 
 export default function Header() {
@@ -66,7 +65,10 @@ export default function Header() {
           </nav>
 
           <div className="site-header__actions">
-            <button className="site-header__logout desktop-only" onClick={handleLogout}>
+            <button
+              className="site-header__logout desktop-only"
+              onClick={handleLogout}
+            >
               Déconnexion
             </button>
 
@@ -121,7 +123,10 @@ export default function Header() {
           ))}
         </nav>
 
-        <button className="site-header__logout mobile-menu__logout" onClick={handleLogout}>
+        <button
+          className="site-header__logout mobile-menu__logout"
+          onClick={handleLogout}
+        >
           Déconnexion
         </button>
       </aside>

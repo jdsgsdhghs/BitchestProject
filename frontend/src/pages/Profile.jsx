@@ -163,172 +163,179 @@ export default function Profile() {
 
   return (
     <>
-    <Header />
-    <section className="profile-page">
-      <div className="profile-page__bg profile-page__bg--one" />
-      <div className="profile-page__bg profile-page__bg--two" />
-      <div className="profile-page__bg profile-page__bg--three" />
+      <Header />
+      <section className="profile-page">
+        <div className="profile-page__bg profile-page__bg--one" />
+        <div className="profile-page__bg profile-page__bg--two" />
+        <div className="profile-page__bg profile-page__bg--three" />
 
-      <div className="profile-shell">
-        <header className="profile-hero glass">
-          <div className="profile-hero__left">
-            <div className="profile-avatar">{initials}</div>
+        <div className="profile-shell">
+          <header className="profile-hero glass">
+            <div className="profile-hero__left">
+              <div className="profile-avatar">{initials}</div>
 
-            <div>
-              <p className="profile-hero__eyebrow">Mon espace</p>
-              <h1 className="profile-hero__title">
-                {user.prenom || "Utilisateur"} {user.nom || ""}
-              </h1>
-              <p className="profile-hero__subtitle">{user.mail}</p>
-            </div>
-          </div>
-
-          <div className="profile-hero__stats">
-            <div className="profile-stat glass glass--soft">
-              <span>Rôle</span>
-              <strong>{user.role || "ROLE_USER"}</strong>
-            </div>
-
-            <div className="profile-stat glass glass--soft">
-              <span>Wallet</span>
-              <strong>{user.walletBalance ?? user.wallet?.balance ?? 0} €</strong>
-            </div>
-          </div>
-        </header>
-
-        {error && <div className="profile-alert profile-alert--error glass">{error}</div>}
-        {message && <div className="profile-alert profile-alert--success glass">{message}</div>}
-
-        <div className="profile-grid">
-          <article className="profile-card glass">
-            <div className="profile-card__head">
-              <h2>Informations du compte</h2>
-              <button className="btn btn--ghost" onClick={handleEditToggle}>
-                {isEditing ? "Annuler" : "Modifier"}
-              </button>
-            </div>
-
-            {!isEditing ? (
-              <div className="profile-infos">
-                <div className="info-row">
-                  <span>Email</span>
-                  <strong>{user.mail || "Non renseigné"}</strong>
-                </div>
-
-                <div className="info-row">
-                  <span>Prénom</span>
-                  <strong>{user.prenom || "Non renseigné"}</strong>
-                </div>
-
-                <div className="info-row">
-                  <span>Nom</span>
-                  <strong>{user.nom || "Non renseigné"}</strong>
-                </div>
-
-                <div className="info-row">
-                  <span>Date de création</span>
-                  <strong>{user.creationDate || "—"}</strong>
-                </div>
+              <div>
+                <p className="profile-hero__eyebrow">Mon espace</p>
+                <h1 className="profile-hero__title">
+                  {user.prenom || "Utilisateur"} {user.nom || ""}
+                </h1>
+                <p className="profile-hero__subtitle">{user.mail}</p>
               </div>
-            ) : (
-              <form className="profile-form" onSubmit={handleSubmit}>
-                <div className="profile-form__grid">
-                  <label className="field">
-                    <span>Email</span>
-                    <input
-                      type="email"
-                      name="mail"
-                      value={formData.mail}
-                      onChange={handleChange}
-                      required
-                    />
-                  </label>
-
-                  <label className="field">
-                    <span>Prénom</span>
-                    <input
-                      type="text"
-                      name="prenom"
-                      value={formData.prenom}
-                      onChange={handleChange}
-                    />
-                  </label>
-
-                  <label className="field">
-                    <span>Nom</span>
-                    <input
-                      type="text"
-                      name="nom"
-                      value={formData.nom}
-                      onChange={handleChange}
-                    />
-                  </label>
-
-                  <label className="field field--full">
-                    <span>Nouveau mot de passe</span>
-                    <input
-                      type="password"
-                      name="password"
-                      value={formData.password}
-                      onChange={handleChange}
-                      placeholder="Laisser vide pour ne pas le changer"
-                    />
-                  </label>
-                </div>
-
-                <div className="profile-form__actions">
-                  <button
-                    type="submit"
-                    className="btn btn--primary"
-                    disabled={saving}
-                  >
-                    {saving ? "Enregistrement..." : "Enregistrer"}
-                  </button>
-
-                  <button
-                    type="button"
-                    className="btn btn--ghost"
-                    onClick={handleEditToggle}
-                  >
-                    Annuler
-                  </button>
-                </div>
-              </form>
-            )}
-          </article>
-
-          <aside className="profile-card glass">
-            <div className="profile-card__head">
-              <h2>Résumé</h2>
             </div>
 
-            <div className="profile-summary">
-              <div className="summary-box glass glass--soft">
-                <span>Identifiant</span>
-                <strong>#{user.id}</strong>
-              </div>
-
-              <div className="summary-box glass glass--soft">
+            <div className="profile-hero__stats">
+              <div className="profile-stat glass glass--soft">
                 <span>Rôle</span>
                 <strong>{user.role || "ROLE_USER"}</strong>
               </div>
 
-              <div className="summary-box glass glass--soft">
-                <span>Balance wallet</span>
-                <strong>{user.walletBalance ?? user.wallet?.balance ?? 0} €</strong>
-              </div>
-
-              <div className="summary-box glass glass--soft">
-                <span>Wallet ID</span>
-                <strong>{user.wallet?.id ?? "—"}</strong>
+              <div className="profile-stat glass glass--soft">
+                <span>Wallet</span>
+                <strong>
+                  {user.walletBalance ?? user.wallet?.balance ?? 0} €
+                </strong>
               </div>
             </div>
-          </aside>
-        </div>
-      </div>
-    </section>
+          </header>
 
-    <Footer />
+          {error && (
+            <div className="profile-alert profile-alert--error glass">
+              {error}
+            </div>
+          )}
+          {message && (
+            <div className="profile-alert profile-alert--success glass">
+              {message}
+            </div>
+          )}
+
+          <div className="profile-grid">
+            <article className="profile-card glass">
+              <div className="profile-card__head">
+                <h2>Informations du compte</h2>
+                <button className="btn btn--ghost" onClick={handleEditToggle}>
+                  {isEditing ? "Annuler" : "Modifier"}
+                </button>
+              </div>
+
+              {!isEditing ? (
+                <div className="profile-infos">
+                  <div className="info-row">
+                    <span>Email</span>
+                    <strong>{user.mail || "Non renseigné"}</strong>
+                  </div>
+
+                  <div className="info-row">
+                    <span>Prénom</span>
+                    <strong>{user.prenom || "Non renseigné"}</strong>
+                  </div>
+
+                  <div className="info-row">
+                    <span>Nom</span>
+                    <strong>{user.nom || "Non renseigné"}</strong>
+                  </div>
+
+                  <div className="info-row">
+                    <span>Date de création</span>
+                    <strong>{user.creationDate || "—"}</strong>
+                  </div>
+                </div>
+              ) : (
+                <form className="profile-form" onSubmit={handleSubmit}>
+                  <div className="profile-form__grid">
+                    <label className="field">
+                      <span>Email</span>
+                      <input
+                        type="email"
+                        name="mail"
+                        value={formData.mail}
+                        onChange={handleChange}
+                        required
+                      />
+                    </label>
+
+                    <label className="field">
+                      <span>Prénom</span>
+                      <input
+                        type="text"
+                        name="prenom"
+                        value={formData.prenom}
+                        onChange={handleChange}
+                      />
+                    </label>
+
+                    <label className="field">
+                      <span>Nom</span>
+                      <input
+                        type="text"
+                        name="nom"
+                        value={formData.nom}
+                        onChange={handleChange}
+                      />
+                    </label>
+
+                    <label className="field field--full">
+                      <span>Nouveau mot de passe</span>
+                      <input
+                        type="password"
+                        name="password"
+                        value={formData.password}
+                        onChange={handleChange}
+                        placeholder="Laisser vide pour ne pas le changer"
+                      />
+                    </label>
+                  </div>
+
+                  <div className="profile-form__actions">
+                    <button
+                      type="submit"
+                      className="btn btn--primary"
+                      disabled={saving}
+                    >
+                      {saving ? "Enregistrement..." : "Enregistrer"}
+                    </button>
+
+                    <button
+                      type="button"
+                      className="btn btn--ghost"
+                      onClick={handleEditToggle}
+                    >
+                      Annuler
+                    </button>
+                  </div>
+                </form>
+              )}
+            </article>
+
+            <aside className="profile-card glass">
+              <div className="profile-card__head">
+                <h2>Résumé</h2>
+              </div>
+
+              <div className="profile-summary">
+                <div className="summary-box glass glass--soft">
+                  <span>Identifiant</span>
+                  <strong>#{user.id}</strong>
+                </div>
+
+                <div className="summary-box glass glass--soft">
+                  <span>Rôle</span>
+                  <strong>{user.role || "ROLE_USER"}</strong>
+                </div>
+
+                <div className="summary-box glass glass--soft">
+                  <span>Balance wallet</span>
+                  <strong>
+                    {user.walletBalance ?? user.wallet?.balance ?? 0} €
+                  </strong>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <Footer />
     </>
   );
 }

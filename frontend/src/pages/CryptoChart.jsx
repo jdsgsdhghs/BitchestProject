@@ -11,7 +11,6 @@ import {
 import Header from "../Components/layout/Header";
 import Footer from "../Components/layout/Footer";
 
-
 const CRYPTOS = [
   { id: 1, name: "Bitcoin" },
   { id: 2, name: "Ethereum" },
@@ -38,7 +37,6 @@ const COLORS = {
   Stellar: "#7D00FF",
 };
 
-
 const CustomTooltip = ({ active, payload, label, color }) => {
   if (!active || !payload?.length) return null;
   return (
@@ -63,7 +61,6 @@ const CustomTooltip = ({ active, payload, label, color }) => {
   );
 };
 
-
 export default function CryptoChart() {
   const [selected, setSelected] = useState(CRYPTOS[0]);
   const [data, setData] = useState([]);
@@ -73,16 +70,15 @@ export default function CryptoChart() {
   useEffect(() => {
     let cancelled = false;
 
-    
     setLoading(true);
     setError(null);
     setData([]);
 
     const loadQuotations = async () => {
       try {
-        const r = await fetch(
-          `http://localhost:8000/api/crypto/${selected.id}/quotations`,
-        {credentials: "include"});
+        const r = await fetch(`/api/crypto/${selected.id}/quotations`, {
+          credentials: "include",
+        });
         if (!r.ok) throw new Error(`Erreur HTTP ${r.status}`);
         const json = await r.json();
 
@@ -102,7 +98,6 @@ export default function CryptoChart() {
 
     loadQuotations();
 
-    
     return () => {
       cancelled = true;
     };
@@ -116,244 +111,240 @@ export default function CryptoChart() {
 
   return (
     <>
-    <Header />
+      <Header />
 
-    <div
-      style={{
-        minHeight: "100vh",
-        background: "#080b14",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        padding: "40px 20px",
-        fontFamily: "'DM Mono', 'Courier New', monospace",
-        color: "#e0e0e0",
-      }}
-    >
-      
-      <div style={{ textAlign: "center", marginBottom: 36 }}>
-        <h1
-          style={{
-            fontSize: 28,
-            fontWeight: 800,
-            letterSpacing: "0.15em",
-            textTransform: "uppercase",
-            color: "#fff",
-            margin: 0,
-          }}
-        >
-          ₿ Bitchest
-        </h1>
-        <p
-          style={{
-            color: "#555",
-            fontSize: 13,
-            marginTop: 6,
-            letterSpacing: "0.08em",
-          }}
-        >
-          Évolution des cotations — 30 derniers jours
-        </p>
-      </div>
-
-    
       <div
         style={{
+          minHeight: "100vh",
+          background: "#080b14",
           display: "flex",
-          flexWrap: "wrap",
-          gap: 8,
-          justifyContent: "center",
-          marginBottom: 32,
-          maxWidth: 700,
+          flexDirection: "column",
+          alignItems: "center",
+          padding: "40px 20px",
+          fontFamily: "'DM Mono', 'Courier New', monospace",
+          color: "#e0e0e0",
         }}
       >
-        {CRYPTOS.map((crypto) => (
-          <button
-            key={crypto.id}
-            onClick={() => setSelected(crypto)}
+        <div style={{ textAlign: "center", marginBottom: 36 }}>
+          <h1
             style={{
-              padding: "7px 16px",
-              borderRadius: 20,
-              border:
-                selected.id === crypto.id
-                  ? `1.5px solid ${COLORS[crypto.name]}`
-                  : "1.5px solid #2a2a3a",
-              background:
-                selected.id === crypto.id
-                  ? `${COLORS[crypto.name]}18`
-                  : "transparent",
-              color: selected.id === crypto.id ? COLORS[crypto.name] : "#666",
-              fontFamily: "inherit",
-              fontSize: 13,
-              fontWeight: selected.id === crypto.id ? 700 : 400,
-              cursor: "pointer",
-              transition: "all 0.2s",
-              letterSpacing: "0.04em",
+              fontSize: 28,
+              fontWeight: 800,
+              letterSpacing: "0.15em",
+              textTransform: "uppercase",
+              color: "#fff",
+              margin: 0,
             }}
           >
-            {crypto.name}
-          </button>
-        ))}
-      </div>
+            ₿ Bitchest
+          </h1>
+          <p
+            style={{
+              color: "#555",
+              fontSize: 13,
+              marginTop: 6,
+              letterSpacing: "0.08em",
+            }}
+          >
+            Évolution des cotations — 30 derniers jours
+          </p>
+        </div>
 
-      
-      <div
-        style={{
-          width: "100%",
-          maxWidth: 820,
-          background: "#0f1117",
-          borderRadius: 20,
-          border: `1px solid ${color}22`,
-          padding: "28px 28px 20px",
-          boxShadow: `0 0 60px ${color}11`,
-        }}
-      >
-        
         <div
           style={{
             display: "flex",
-            justifyContent: "space-between",
-            alignItems: "flex-end",
-            marginBottom: 24,
+            flexWrap: "wrap",
+            gap: 8,
+            justifyContent: "center",
+            marginBottom: 32,
+            maxWidth: 700,
           }}
         >
-          <div>
-            <div
+          {CRYPTOS.map((crypto) => (
+            <button
+              key={crypto.id}
+              onClick={() => setSelected(crypto)}
               style={{
+                padding: "7px 16px",
+                borderRadius: 20,
+                border:
+                  selected.id === crypto.id
+                    ? `1.5px solid ${COLORS[crypto.name]}`
+                    : "1.5px solid #2a2a3a",
+                background:
+                  selected.id === crypto.id
+                    ? `${COLORS[crypto.name]}18`
+                    : "transparent",
+                color: selected.id === crypto.id ? COLORS[crypto.name] : "#666",
+                fontFamily: "inherit",
                 fontSize: 13,
-                color: "#555",
-                letterSpacing: "0.08em",
-                textTransform: "uppercase",
+                fontWeight: selected.id === crypto.id ? 700 : 400,
+                cursor: "pointer",
+                transition: "all 0.2s",
+                letterSpacing: "0.04em",
               }}
             >
-              {selected.name}
-            </div>
-            <div
-              style={{
-                fontSize: 32,
-                fontWeight: 800,
-                color: "#fff",
-                marginTop: 4,
-              }}
-            >
-              {current?.toLocaleString("fr-FR", {
-                minimumFractionDigits: 2,
-                maximumFractionDigits: 4,
-              })}{" "}
-              $
-            </div>
-          </div>
-          <div
-            style={{
-              background: isUp ? "#0d2b1a" : "#2b0d0d",
-              border: `1px solid ${isUp ? "#1a7a42" : "#7a1a1a"}`,
-              borderRadius: 10,
-              padding: "6px 14px",
-              fontSize: 15,
-              fontWeight: 700,
-              color: isUp ? "#2ecc71" : "#e74c3c",
-            }}
-          >
-            {isUp ? "▲" : "▼"} {Math.abs(delta).toFixed(2)}%
-          </div>
+              {crypto.name}
+            </button>
+          ))}
         </div>
 
-        {/* Chart */}
-        {loading ? (
-          <div
-            style={{
-              height: 280,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "#444",
-            }}
-          >
-            Chargement...
-          </div>
-        ) : error ? (
-          <div
-            style={{
-              height: 280,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              color: "#e74c3c",
-              fontSize: 13,
-            }}
-          >
-            ⚠ {error} — vérifie que ton API Symfony est bien démarrée sur le
-            port 8000
-          </div>
-        ) : (
-          <ResponsiveContainer width="100%" height={280}>
-            <LineChart
-              data={data}
-              margin={{ top: 5, right: 10, left: 0, bottom: 0 }}
-            >
-              <defs>
-                <linearGradient id="lineGlow" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0%" stopColor={color} stopOpacity={0.4} />
-                  <stop offset="50%" stopColor={color} stopOpacity={1} />
-                  <stop offset="100%" stopColor={color} stopOpacity={0.4} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid
-                stroke="#1a1a2e"
-                strokeDasharray="4 4"
-                vertical={false}
-              />
-              <XAxis
-                dataKey="date"
-                tick={{ fill: "#444", fontSize: 11, fontFamily: "inherit" }}
-                axisLine={false}
-                tickLine={false}
-                interval={4}
-              />
-              <YAxis
-                tick={{ fill: "#444", fontSize: 11, fontFamily: "inherit" }}
-                axisLine={false}
-                tickLine={false}
-                width={70}
-                tickFormatter={(v) =>
-                  v >= 1000
-                    ? `${(v / 1000).toFixed(1)}k`
-                    : v.toFixed(v < 1 ? 4 : 2)
-                }
-              />
-              <Tooltip content={<CustomTooltip color={color} />} />
-              <Line
-                type="monotone"
-                dataKey="value"
-                stroke="url(#lineGlow)"
-                strokeWidth={2.5}
-                dot={false}
-                activeDot={{
-                  r: 5,
-                  fill: color,
-                  stroke: "#0f1117",
-                  strokeWidth: 2,
-                }}
-              />
-            </LineChart>
-          </ResponsiveContainer>
-        )}
-
-        <p
+        <div
           style={{
-            fontSize: 11,
-            color: "#333",
-            textAlign: "right",
-            marginTop: 12,
-            letterSpacing: "0.05em",
+            width: "100%",
+            maxWidth: 820,
+            background: "#0f1117",
+            borderRadius: 20,
+            border: `1px solid ${color}22`,
+            padding: "28px 28px 20px",
+            boxShadow: `0 0 60px ${color}11`,
           }}
         >
-          Données API Symfony • Bitchest prototype
-        </p>
-      </div>
-    </div>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "flex-end",
+              marginBottom: 24,
+            }}
+          >
+            <div>
+              <div
+                style={{
+                  fontSize: 13,
+                  color: "#555",
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
+                }}
+              >
+                {selected.name}
+              </div>
+              <div
+                style={{
+                  fontSize: 32,
+                  fontWeight: 800,
+                  color: "#fff",
+                  marginTop: 4,
+                }}
+              >
+                {current?.toLocaleString("fr-FR", {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 4,
+                })}{" "}
+                $
+              </div>
+            </div>
+            <div
+              style={{
+                background: isUp ? "#0d2b1a" : "#2b0d0d",
+                border: `1px solid ${isUp ? "#1a7a42" : "#7a1a1a"}`,
+                borderRadius: 10,
+                padding: "6px 14px",
+                fontSize: 15,
+                fontWeight: 700,
+                color: isUp ? "#2ecc71" : "#e74c3c",
+              }}
+            >
+              {isUp ? "▲" : "▼"} {Math.abs(delta).toFixed(2)}%
+            </div>
+          </div>
 
-    <Footer />
+          {/* Chart */}
+          {loading ? (
+            <div
+              style={{
+                height: 280,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#444",
+              }}
+            >
+              Chargement...
+            </div>
+          ) : error ? (
+            <div
+              style={{
+                height: 280,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#e74c3c",
+                fontSize: 13,
+              }}
+            >
+              ⚠ {error} — vérifie que ton API Symfony est bien démarrée sur le
+              port 8000
+            </div>
+          ) : (
+            <ResponsiveContainer width="100%" height={280}>
+              <LineChart
+                data={data}
+                margin={{ top: 5, right: 10, left: 0, bottom: 0 }}
+              >
+                <defs>
+                  <linearGradient id="lineGlow" x1="0" y1="0" x2="1" y2="0">
+                    <stop offset="0%" stopColor={color} stopOpacity={0.4} />
+                    <stop offset="50%" stopColor={color} stopOpacity={1} />
+                    <stop offset="100%" stopColor={color} stopOpacity={0.4} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid
+                  stroke="#1a1a2e"
+                  strokeDasharray="4 4"
+                  vertical={false}
+                />
+                <XAxis
+                  dataKey="date"
+                  tick={{ fill: "#444", fontSize: 11, fontFamily: "inherit" }}
+                  axisLine={false}
+                  tickLine={false}
+                  interval={4}
+                />
+                <YAxis
+                  tick={{ fill: "#444", fontSize: 11, fontFamily: "inherit" }}
+                  axisLine={false}
+                  tickLine={false}
+                  width={70}
+                  tickFormatter={(v) =>
+                    v >= 1000
+                      ? `${(v / 1000).toFixed(1)}k`
+                      : v.toFixed(v < 1 ? 4 : 2)
+                  }
+                />
+                <Tooltip content={<CustomTooltip color={color} />} />
+                <Line
+                  type="monotone"
+                  dataKey="value"
+                  stroke="url(#lineGlow)"
+                  strokeWidth={2.5}
+                  dot={false}
+                  activeDot={{
+                    r: 5,
+                    fill: color,
+                    stroke: "#0f1117",
+                    strokeWidth: 2,
+                  }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+          )}
+
+          <p
+            style={{
+              fontSize: 11,
+              color: "#333",
+              textAlign: "right",
+              marginTop: 12,
+              letterSpacing: "0.05em",
+            }}
+          >
+            Données API Symfony • Bitchest prototype
+          </p>
+        </div>
+      </div>
+
+      <Footer />
     </>
   );
 }

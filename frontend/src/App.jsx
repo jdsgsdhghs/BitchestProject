@@ -17,7 +17,7 @@ import Profile from "./pages/Profile";
 
 export default function App() {
   useEffect(() => {
-    fetch("http://localhost:8000/api/health")
+    fetch("/api/health")
       .then((r) => r.json())
       .then((data) => console.log("health:", data))
       .catch((err) => console.error("health error:", err));

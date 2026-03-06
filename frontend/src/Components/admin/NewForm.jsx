@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import Header from "../layout/Header";
+import Footer from "../layout/Footer";
 
 export default function NewForm({ service }) {
   const [mail, setMail] = useState("");
@@ -33,23 +35,27 @@ export default function NewForm({ service }) {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input
-        value={mail}
-        onChange={(e) => setMail(e.target.value)}
-        placeholder="mail"
-      />
-      <select value={role} onChange={(e) => setRole(e.target.value)}>
-        <option value="client">client</option>
-        <option value="admin">admin</option>
-      </select>
-      {/* <input
+    <>
+      <Header />
+      <form onSubmit={handleSubmit}>
+        <input
+          value={mail}
+          onChange={(e) => setMail(e.target.value)}
+          placeholder="mail"
+        />
+        <select value={role} onChange={(e) => setRole(e.target.value)}>
+          <option value="client">client</option>
+          <option value="admin">admin</option>
+        </select>
+        {/* <input
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         placeholder="password (optional)"
         type="password"
       /> */}
-      <button type="submit">Create User</button>
-    </form>
+        <button type="submit">Create User</button>
+      </form>
+      <Footer />
+    </>
   );
 }
