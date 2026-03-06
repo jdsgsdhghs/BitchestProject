@@ -1,15 +1,44 @@
-# BitchestProject
+🚀 Installation du projet
+1️⃣ Cloner le repository
+git clone https://github.com/votre-repo/bitchestproject.git
+cd bitchestproject
 
-## Admin
-- En tant qu'admin, je veux me connecter à l'application 
-- En tant qu'admin, je veux pouvoir modifier et consulter les informations des utilisateurs 
+⚙️ Installation du Backend (Symfony)
+Accéder au dossier backend
+cd backend
+Installer les dépendances
+composer install
+Configuration de l'environnement
+
+Créer un fichier .env.local :
+
+cp .env .env.local
+
+Configurer la base de données :
+
+DATABASE_URL="mysql://root:password@127.0.0.1:3306/bitchest"
+Créer la base de données
+php bin/console doctrine:database:create
+Lancer les migrations
+php bin/console doctrine:migrations:migrate
+Démarrer le serveur backend
+
+Avec Symfony CLI :
+
+symfony server:start
 
 
-## User
-- En tant qu'utilisateur, je veux m'enregistrer sur l'application en créant mes identifiants
-- En tant qu'utilisateur, je veux me connecter à l'application avec mes identifiants 
-- En tant qu'utilisateur, je veux consulter et modifier les informations relatives à mon compte
-- En tant qu'utilisateur, je veux consulter la liste des cryptomonnaies disponibles à l'achat et suivre leur évolution 
-- En tant qu'utilisateur, je veux consulter mon portefeuille
-- En tant qu'utilisateur, je veux acheter des cryptomonnaies qui seront ajoutées à mon portefeuille 
-- En tant qu'utilisateur, je veux vendre des cryptomonnaies que je possède sur mon portefeuille 
+
+Le backend sera disponible sur :
+
+http://localhost:8000
+💻 Installation du Frontend (React)
+
+Ouvrir un nouveau terminal.
+
+Accéder au dossier frontend
+cd frontend
+Installer les dépendances
+npm install
+Lancer l'application
+npm run dev
