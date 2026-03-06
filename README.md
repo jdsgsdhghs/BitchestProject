@@ -1,4 +1,3 @@
-HD — 4:44 PM
 🚀 Installation du projet
 1️⃣ Cloner le repository
 git clone https://github.com/votre-repo/bitchestproject.git
