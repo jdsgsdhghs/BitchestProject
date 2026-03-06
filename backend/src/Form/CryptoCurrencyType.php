@@ -13,7 +13,7 @@ class CryptoCurrencyType extends AbstractType
     {
         $builder
             ->add('name')
-            ->add('symbol')
+            ->add('actualValue')
         ;
     }
 
@@ -21,6 +21,7 @@ class CryptoCurrencyType extends AbstractType
     {
         $resolver->setDefaults([
             'data_class' => CryptoCurrency::class,
+            'csrf_protection' => false,
         ]);
     }
 }

@@ -8,9 +8,9 @@ use Symfony\Component\Routing\Attribute\Route;
 
 final class PingController extends AbstractController
 {
-    #[Route('/api/health', name: 'api_health', methods: ['GET'])]
-    public function __invoke(): JsonResponse
-    {
-        return $this->json(['Symfoni API status' => "up"]);
-    }
+  #[Route('/api/health', name: 'api_health', methods: ['GET'])]
+  public function __invoke(): JsonResponse
+  {
+    return $this->json(['Symfoni API status' => "up"]);
+  }
 }

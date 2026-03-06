@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\CryptoCurrencyRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CryptoCurrencyRepository::class)]
@@ -13,11 +15,22 @@ class CryptoCurrency
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 100)]
+    #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\Column(length: 10)]
-    private ?string $symbol = null;
+    #[ORM\Column]
+    private ?float $actualValue = null;
+
+    /**
+     * @var Collection<int, AcquieredCrypto>
+     */
+    #[ORM\OneToMany(targetEntity: AcquieredCrypto::class, mappedBy: 'cryptoId', orphanRemoval: true)]
+    private Collection $aqcuieredCryptos;
+
+    public function __construct()
+    {
+        $this->aqcuieredCryptos = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -36,14 +49,44 @@ class CryptoCurrency
         return $this;
     }
 
-    public function getSymbol(): ?string
+    public function getActualValue(): ?float
     {
-        return $this->symbol;
+        return $this->actualValue;
     }
 
-    public function setSymbol(string $symbol): static
+    public function setActualValue(float $actualValue): static
     {
-        $this->symbol = $symbol;
+        $this->actualValue = $actualValue;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, AcquieredCrypto>
+     */
+    public function getAqcuieredCryptos(): Collection
+    {
+        return $this->aqcuieredCryptos;
+    }
+
+    public function addAqcuieredCrypto(AcquieredCrypto $aqcuieredCrypto): static
+    {
+        if (!$this->aqcuieredCryptos->contains($aqcuieredCrypto)) {
+            $this->aqcuieredCryptos->add($aqcuieredCrypto);
+            $aqcuieredCrypto->setCryptoId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAqcuieredCrypto(AcquieredCrypto $aqcuieredCrypto): static
+    {
+        if ($this->aqcuieredCryptos->removeElement($aqcuieredCrypto)) {
+            // set the owning side to null (unless already changed)
+            if ($aqcuieredCrypto->getCryptoId() === $this) {
+                $aqcuieredCrypto->setCryptoId(null);
+            }
+        }
 
         return $this;
     }

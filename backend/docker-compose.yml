@@ -1,23 +1,28 @@
-version: "3.9"
 services:
-  mysql:
-    image: mysql:8.0
-    command: --default-authentication-plugin=mysql_native_password
-    restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: mydb
-    ports:
-      - "3306:3306"
+    mysql:
+        image: mysql:8.0
+        command: --default-authentication-plugin=mysql_native_password
+        restart: always
+        environment:
+            DATABASE_URL: "mysql://root:root@localhost:3306/bitchest?serverVersion=8.0.41&charset=utf8mb4"
+            MYSQL_ROOT_PASSWORD: root
+            MYSQL_DATABASE: bitchest
+        ports:
+            - "3306:3306"
+            # - "8000:8000"
 
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    restart: always
-    ports:
-      - "8080:80"
-    environment:
-      PMA_HOST: mysql
-      PMA_USER: root
-      PMA_PASSWORD: root
-    depends_on:
-      - mysql
+    # backend:
+    #     build: ./
+    #     network_mode: service:mysql
+
+    phpmyadmin:
+        image: phpmyadmin/phpmyadmin
+        restart: always
+        ports:
+            - "8080:80"
+        environment:
+            PMA_HOST: mysql
+            PMA_USER: root
+            PMA_PASSWORD: root
+        depends_on:
+            - mysql

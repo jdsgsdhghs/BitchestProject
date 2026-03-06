@@ -8,74 +8,121 @@ use App\Repository\WalletRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/wallet')]
+#[Route('/api/wallet', name: 'api_wallet_')]
 final class WalletController extends AbstractController
 {
-    #[Route(name: 'app_wallet_index', methods: ['GET'])]
-    public function index(WalletRepository $walletRepository): Response
+    #[Route(name: '', methods: ['GET'])]
+    public function index(WalletRepository $walletRepository): JsonResponse
     {
-        return $this->render('wallet/index.html.twig', [
-            'wallets' => $walletRepository->findAll(),
+        $wallets = $walletRepository->findAll();
+        if (!$wallets) {
+            return $this->json(['message' => 'No wallets found'], 404);
+        }
+
+        $result = array_map(
+            fn(Wallet $w) => $this->walletToArray($w),
+            $wallets
+        );
+
+        return $this->json([
+            'wallets' => $result
         ]);
     }
 
-    #[Route('/new', name: 'app_wallet_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    #[Route('/new', name: 'new', methods: ['GET', 'POST'])]
+    public function new(Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
+        $data = json_decode($request->getContent(), true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return $this->json(['error' => 'Invalid JSON: ' . json_last_error_msg()], 400);
+        }
+
         $wallet = new Wallet();
         $form = $this->createForm(WalletType::class, $wallet);
-        $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($wallet);
-            $entityManager->flush();
+        // true = création complète (tous les champs attendus)
+        $form->submit($data);
 
-            return $this->redirectToRoute('app_wallet_index', [], Response::HTTP_SEE_OTHER);
+        if (!$form->isSubmitted() || !$form->isValid()) {
+            return $this->json([
+                'errors' => (string) $form->getErrors(true, false),
+            ], 422);
         }
 
-        return $this->render('wallet/new.html.twig', [
-            'wallet' => $wallet,
-            'form' => $form,
+        $entityManager->persist($wallet);
+        $entityManager->flush();
+
+        return new JsonResponse([
+            'id' => $wallet->getId(),
+            'balance' => $wallet->getBalance(),
+            'clientId' => $wallet->getClientId(),
         ]);
     }
+
 
     #[Route('/{id}', name: 'app_wallet_show', methods: ['GET'])]
-    public function show(Wallet $wallet): Response
+    public function show(int $id, WalletRepository $walletRepository): JsonResponse
     {
-        return $this->render('wallet/show.html.twig', [
-            'wallet' => $wallet,
-        ]);
+        $wallet = $walletRepository->find($id);
+
+        if (!$wallet) {
+            return $this->json(['message' => 'Wallet not found'], 404);
+        }
+
+        return $this->json($this->walletToArray($wallet));
     }
 
-    #[Route('/{id}/edit', name: 'app_wallet_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Wallet $wallet, EntityManagerInterface $entityManager): Response
-    {
+    #[Route('/{id}/edit', name: 'app_wallet_edit', methods: ['PUT', 'PATCH'])]
+    public function update(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        Wallet $wallet
+    ): JsonResponse {
+        $data = json_decode($request->getContent(), true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return $this->json(['error' => 'Invalid JSON: ' . json_last_error_msg()], 400);
+        }
+
         $form = $this->createForm(WalletType::class, $wallet);
-        $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
+        // PATCH: update partiel (ne met pas à null les champs absents)
+        $clearMissing = $request->getMethod() !== 'PATCH';
+        $form->submit($data, $clearMissing);
 
-            return $this->redirectToRoute('app_wallet_index', [], Response::HTTP_SEE_OTHER);
+        if (!$form->isValid()) {
+            return $this->json([
+                'errors' => (string) $form->getErrors(true, false),
+            ], 422);
         }
 
-        return $this->render('wallet/edit.html.twig', [
-            'wallet' => $wallet,
-            'form' => $form,
-        ]);
+        $entityManager->flush();
+
+        return $this->json($this->walletToArray($wallet));
     }
 
-    #[Route('/{id}', name: 'app_wallet_delete', methods: ['POST'])]
-    public function delete(Request $request, Wallet $wallet, EntityManagerInterface $entityManager): Response
+    #[Route('/{id}/delete', name: '_delete', methods: ['DELETE'])]
+    public function delete(EntityManagerInterface $entityManager, Wallet $wallet): JsonResponse
     {
-        if ($this->isCsrfTokenValid('delete'.$wallet->getId(), $request->getPayload()->getString('_token'))) {
-            $entityManager->remove($wallet);
-            $entityManager->flush();
-        }
+        $entityManager->remove($wallet);
+        $entityManager->flush();
 
-        return $this->redirectToRoute('app_wallet_index', [], Response::HTTP_SEE_OTHER);
+        return $this->json(['message' => 'Wallet deleted successfully'], 200);
+    }
+    private function walletToArray(Wallet $wallet): array
+    {
+        $client = $wallet->getClientId();
+
+        return [
+            'id' => $wallet->getId(),
+            'balance' => $wallet->getBalance(),
+            'client' => $client ? [
+                'id' => $client->getId(),
+            ] : null,
+        ];
     }
 }

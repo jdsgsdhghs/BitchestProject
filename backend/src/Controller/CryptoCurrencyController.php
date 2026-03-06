@@ -8,74 +8,150 @@ use App\Repository\CryptoCurrencyRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Repository\CryptoQuotationRepository;
 
-#[Route('/crypto/currency')]
+#[Route('api/crypto', name: "api_cryptocurrency_")]
 final class CryptoCurrencyController extends AbstractController
 {
-    #[Route(name: 'app_crypto_currency_index', methods: ['GET'])]
-    public function index(CryptoCurrencyRepository $cryptoCurrencyRepository): Response
+    #[Route('', name: '_list', methods: ['GET'])]
+    public function list(CryptoCurrencyRepository $CryptoCurrencyRepository): JsonResponse
     {
-        return $this->render('crypto_currency/index.html.twig', [
-            'crypto_currencies' => $cryptoCurrencyRepository->findAll(),
-        ]);
-    }
+        $CryptoCurrencies = $CryptoCurrencyRepository->findAll();
 
-    #[Route('/new', name: 'app_crypto_currency_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
-    {
-        $cryptoCurrency = new CryptoCurrency();
-        $form = $this->createForm(CryptoCurrencyType::class, $cryptoCurrency);
-        $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($cryptoCurrency);
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_crypto_currency_index', [], Response::HTTP_SEE_OTHER);
+        if (!$CryptoCurrencies) {
+            return $this->json(['message' => 'No CryptoCurrencies found'], 404);
         }
 
-        return $this->render('crypto_currency/new.html.twig', [
-            'crypto_currency' => $cryptoCurrency,
-            'form' => $form,
+        $result = array_map(
+            fn(CryptoCurrency $c) => $this->cryptoToArray($c),
+            $CryptoCurrencies
+        );
+
+        return $this->json([
+            'CryptoCurrencies' => $result
         ]);
     }
 
-    #[Route('/{id}', name: 'app_crypto_currency_show', methods: ['GET'])]
-    public function show(CryptoCurrency $cryptoCurrency): Response
+    #[Route('/new', name: '_create', methods: ['POST'])]
+    public function create(Request $request, EntityManagerInterface $entityManager): JsonResponse
     {
-        return $this->render('crypto_currency/show.html.twig', [
-            'crypto_currency' => $cryptoCurrency,
-        ]);
-    }
+        $data = json_decode($request->getContent(), true);
 
-    #[Route('/{id}/edit', name: 'app_crypto_currency_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, CryptoCurrency $cryptoCurrency, EntityManagerInterface $entityManager): Response
-    {
-        $form = $this->createForm(CryptoCurrencyType::class, $cryptoCurrency);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
-
-            return $this->redirectToRoute('app_crypto_currency_index', [], Response::HTTP_SEE_OTHER);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return $this->json(['error' => 'Invalid JSON: ' . json_last_error_msg()], 400);
         }
 
-        return $this->render('crypto_currency/edit.html.twig', [
-            'crypto_currency' => $cryptoCurrency,
-            'form' => $form,
+        $CryptoCurrency = new CryptoCurrency();
+        $form = $this->createForm(CryptoCurrencyType::class, $CryptoCurrency);
+
+        // true = création complète (tous les champs attendus)
+        $form->submit($data);
+
+        if (!$form->isSubmitted() || !$form->isValid()) {
+            return $this->json([
+                'errors' => (string) $form->getErrors(true, false),
+            ], 422);
+        }
+
+        $entityManager->persist($CryptoCurrency);
+        $entityManager->flush();
+
+        return $this->json($CryptoCurrency);
+    }
+
+    #[Route('/{id}', name: '_show', methods: ['GET'])]
+    public function show(int $id, CryptoCurrencyRepository $CryptoCurrencyRepository): JsonResponse
+    {
+        $CryptoCurrency = $CryptoCurrencyRepository->find($id);
+
+        if (!$CryptoCurrency) {
+            return $this->json(['message: no crypto founded'], 404);
+        }
+
+        return $this->json($this->cryptoToArray($CryptoCurrency));
+    }
+    #[Route('/{id}/quotations', name: '_quotations', methods: ['GET'])]
+    public function quotations(
+        int $id,
+        CryptoCurrencyRepository $cryptoCurrencyRepository,
+        CryptoQuotationRepository $quotationRepository
+    ): JsonResponse {
+        $crypto = $cryptoCurrencyRepository->find($id);
+
+        if (!$crypto) {
+            return $this->json(['message' => 'Crypto not found'], 404);
+        }
+
+        $quotations = $quotationRepository->findByCrypto($id);
+
+        $result = array_map(fn($q) => [
+            'value'    => $q->getValue(),
+            'quotedAt' => $q->getQuotedAt()->format('d M'),
+        ], $quotations);
+
+        return $this->json([
+            'crypto'     => $crypto->getName(),
+            'quotations' => $result,
         ]);
     }
 
-    #[Route('/{id}', name: 'app_crypto_currency_delete', methods: ['POST'])]
-    public function delete(Request $request, CryptoCurrency $cryptoCurrency, EntityManagerInterface $entityManager): Response
-    {
-        if ($this->isCsrfTokenValid('delete'.$cryptoCurrency->getId(), $request->getPayload()->getString('_token'))) {
-            $entityManager->remove($cryptoCurrency);
-            $entityManager->flush();
+    #[Route('/{id}/edit', name: '_update', methods: ['PUT', 'PATCH'])]
+    public function update(
+        Request $request,
+        EntityManagerInterface $entityManager,
+        CryptoCurrency $CryptoCurrency
+    ): JsonResponse {
+        $data = json_decode($request->getContent(), true);
+
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            return $this->json(['error' => 'Invalid JSON: ' . json_last_error_msg()], 400);
         }
 
-        return $this->redirectToRoute('app_crypto_currency_index', [], Response::HTTP_SEE_OTHER);
+        $form = $this->createForm(CryptoCurrencyType::class, $CryptoCurrency);
+
+        // PATCH: update partiel (ne met pas à null les champs absents)
+        $clearMissing = $request->getMethod() !== 'PATCH';
+        $form->submit($data, $clearMissing);
+
+        if (!$form->isValid()) {
+            return $this->json([
+                'errors' => (string) $form->getErrors(true, false),
+            ], 422);
+        }
+
+        $entityManager->flush();
+
+        return $this->json($CryptoCurrency);
+    }
+
+    #[Route('/{id}/delete', name: '_delete', methods: ['DELETE'])]
+    public function delete(EntityManagerInterface $entityManager, CryptoCurrency $CryptoCurrency): JsonResponse
+    {
+        $entityManager->remove($CryptoCurrency);
+        $entityManager->flush();
+
+        return $this->json(['message' => 'CryptoCurrency deleted successfully'], 200);
+    }
+
+    private function cryptoToArray(CryptoCurrency $crypto): array
+    {
+        return [
+            'id' => $crypto->getId(),
+            'name' => $crypto->getName(),
+            'actualValue' => $crypto->getActualValue(),
+            'acquieredCryptos' => array_map(
+                function ($acq) {
+                    return [
+                        'id' => $acq->getId(),
+                        'value' => $acq->getValue(),
+                        'walletId' => $acq->getWalletId()?->getId(),
+                    ];
+                },
+                $crypto->getAqcuieredCryptos()->toArray()
+            )
+        ];
     }
 }
