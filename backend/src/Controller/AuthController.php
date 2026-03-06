@@ -129,6 +129,69 @@ final class AuthController extends AbstractController
         ]);
     }
 
+    #[Route('/api/me', methods: ['PATCH'])]
+    public function updateMe(
+        Request $request,
+        EntityManagerInterface $em,
+        UserRepository $users,
+        UserPasswordHasherInterface $hasher
+    ): JsonResponse {
+        /** @var User|null $user */
+        $user = $this->getUser();
+
+        if (!$user) {
+            return $this->json([
+                'ok' => false,
+                'error' => 'unauthenticated'
+            ], 401);
+        }
+
+        $data = json_decode($request->getContent(), true) ?? [];
+
+        if (array_key_exists('mail', $data)) {
+            $mail = trim((string) $data['mail']);
+
+            if ($mail === '') {
+                return $this->json(['error' => 'mail requis'], 400);
+            }
+
+            $existingUser = $users->findOneBy(['mail' => $mail]);
+            if ($existingUser && $existingUser->getId() !== $user->getId()) {
+                return $this->json(['error' => 'mail déjà utilisé'], 409);
+            }
+
+            $user->setMail($mail);
+        }
+
+        if (array_key_exists('nom', $data)) {
+            $nom = trim((string) $data['nom']);
+            $user->setNom($nom !== '' ? $nom : null);
+        }
+
+        if (array_key_exists('prenom', $data)) {
+            $prenom = trim((string) $data['prenom']);
+            $user->setPrenom($prenom !== '' ? $prenom : null);
+        }
+
+        if (array_key_exists('fonction', $data)) {
+            $fonction = trim((string) $data['fonction']);
+            $user->setFonction($fonction !== '' ? $fonction : null);
+        }
+
+        if (!empty($data['password'])) {
+            $user->setPassword(
+                $hasher->hashPassword($user, (string) $data['password'])
+            );
+        }
+
+        $em->flush();
+
+        return $this->json([
+            'ok' => true,
+            'user' => $this->userToArray($user),
+        ]);
+    }
+
     #[Route('/api/logout', methods: ['POST'])]
     public function logout(
         Request $request,
