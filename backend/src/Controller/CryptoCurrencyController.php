@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Repository\CryptoQuotationRepository;
 
 #[Route('api/crypto', name: "api_cryptocurrency_")]
 final class CryptoCurrencyController extends AbstractController
@@ -71,6 +72,30 @@ final class CryptoCurrencyController extends AbstractController
         }
 
         return $this->json($this->cryptoToArray($CryptoCurrency));
+    }
+    #[Route('/{id}/quotations', name: '_quotations', methods: ['GET'])]
+    public function quotations(
+        int $id,
+        CryptoCurrencyRepository $cryptoCurrencyRepository,
+        CryptoQuotationRepository $quotationRepository
+    ): JsonResponse {
+        $crypto = $cryptoCurrencyRepository->find($id);
+
+        if (!$crypto) {
+            return $this->json(['message' => 'Crypto not found'], 404);
+        }
+
+        $quotations = $quotationRepository->findByCrypto($id);
+
+        $result = array_map(fn($q) => [
+            'value'    => $q->getValue(),
+            'quotedAt' => $q->getQuotedAt()->format('d M'),
+        ], $quotations);
+
+        return $this->json([
+            'crypto'     => $crypto->getName(),
+            'quotations' => $result,
+        ]);
     }
 
     #[Route('/{id}/edit', name: '_update', methods: ['PUT', 'PATCH'])]
