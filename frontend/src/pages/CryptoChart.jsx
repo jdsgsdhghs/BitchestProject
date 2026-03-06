@@ -8,6 +8,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import Header from "../Components/layout/Header";
 
 
 const CRYPTOS = [
@@ -113,6 +114,9 @@ export default function CryptoChart() {
   const isUp = delta >= 0;
 
   return (
+    <>
+    <Header />
+
     <div
       style={{
         minHeight: "100vh",
@@ -347,5 +351,6 @@ export default function CryptoChart() {
         </p>
       </div>
     </div>
+    </>
   );
 }

@@ -117,6 +117,7 @@ export default function Login() {
   }
 
   return (
+    <>
     <div className="login-container">
       <div className="login-card">
         <h2 className="login-title">BitChest</h2>
@@ -174,5 +175,6 @@ export default function Login() {
         </p>
       </div>
     </div>
+    </>
   );
 }
